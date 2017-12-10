@@ -45,12 +45,12 @@ return [
 
         'local' => [
             'driver' => 'local',
-            'root' => public_path(),
+            'root' => public_path().'/ficherosInstrucciones',
         ],
 
         'public' => [
             'driver' => 'local',
-            'root' => storage_path('public/'),
+            'root' => storage_path('app/public'),
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
         ],

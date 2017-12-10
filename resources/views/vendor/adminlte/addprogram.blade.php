@@ -121,7 +121,7 @@
                 <input type="hidden" name="_token" value="{!! csrf_token() !!}">
                 <fieldset>
                     <legend>Crear un nuevo programa de ejercicios</legend>
-                        <div class="tab" id="numSecciones"> <a href="#" class="help" data-toggle="tooltip" title="Añadir la información principal del programa que incluye el nombre y la dificultad estimada del mismo." data-placement="right">Información general:</a>
+                    <div class="tab" id="numSecciones"> <a href="#" class="help" data-toggle="tooltip" title="Añadir la información principal del programa que incluye el nombre y la dificultad estimada del mismo." data-placement="right">Información general:</a>
 
                             <div class="form-group">
                             <label for="title" class="col-lg-2 control-label">Nombre</label>
@@ -129,6 +129,7 @@
                                 <input type="text" maxlength="22" class="form-control" id="title" placeholder="Nombre" name="nombrePrograma" required="required">
                             </div>
                         </div>
+
                        <div class="form-group">
                             <label for="content" class="col-lg-2 control-label">Dificultad</label>
                             <div class="col-lg-10">
@@ -141,7 +142,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="tab"> <a href="#" class="help" data-toggle="tooltip" title="Añade categorías que sirven como etiquetas de la clase para que el usuario pueda filtrar ejercicios por ellas" data-placement="right">Añade y crea categorías:</a>
+
+                        <div class="form-group">
                         <label for="content" class="col-lg-2 control-label">Categorias</label>
 	                     <div class="col-lg-3">
 	                            <input list="browsers" class="form-control" name="nombreCategoria" id="nombreCategoria" />
@@ -187,7 +190,9 @@
                             <span class="help-block">.</span>
 
                     </div>
-                     <div class="form-group">
+                    </div>
+                    <div class="tab"> <a href="#" class="help" data-toggle="tooltip" title="Añade categorías que sirven como etiquetas de la clase para que el usuario pueda filtrar ejercicios por ellas" data-placement="right">Añade y crea categorías:</a>
+                        <div class="form-group">
                         <label for="content" class="col-lg-2 control-label">Ejercicios</label>
 	                     <div class="col-lg-3">
 
@@ -205,6 +210,7 @@
 	                        <p id="ejercicios" style="margin-left: 10px;"></p>
 
 	                    </div>
+                        </div>
 
 
 				           <script type="text/javascript">
