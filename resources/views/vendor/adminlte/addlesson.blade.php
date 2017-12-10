@@ -73,6 +73,7 @@ function submitForm()
         duracion:duracionEjercicio,miniatura:document.getElementById('miniatura').value, secciones:seccionesTotales});
     document.getElementById('arrayFinal').value = JSON.stringify(ejercicioFinal);
     document.getElementById('arrayPregunta').value = JSON.stringify(preguntasFinal);
+    document.getElementById('arrayCatergorias').value = JSON.stringify(categorias);
     document.getElementById('form').submit(
 
     );
@@ -93,7 +94,7 @@ function submitForm()
                 <fieldset>
                     <legend>Crear un nuevo ejercicio</legend>
                     <div class="form-group">
-                        <label for="title" class="col-lg-2 control-label">Introduce una imagen que represente la miniatura del ejercicio:</label>
+                        <label for="title" class="col-lg-2 control-label">Miniatura</label>
                     <input type="file" name="miniatura" id="miniatura">
                     </div>
                     <div class="form-group">
@@ -157,7 +158,7 @@ function submitForm()
                          document.getElementById("nombreCategoria").value = "";
                          document.getElementById("categoriasFinal").value = categorias;
                     }
-                   
+
              }
 
            </script>
@@ -517,6 +518,8 @@ function submitForm()
 
             <input type="hidden" id="arrayFinal" name="arrayFinal">
             <input type="hidden" id="arrayPregunta" name="arrayPregunta">
+            <input type="hidden" id="arrayCatergorias" name="arrayCatergorias">
+
 
 
 

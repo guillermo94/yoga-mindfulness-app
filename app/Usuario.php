@@ -30,7 +30,7 @@ class Usuario extends Model
         if(!empty($array['notif_activas'])){$this->notif_activas = $array['notif_activas'];}
         if(!empty($array['hora_notif'])){$this->hora_notif = $array['hora_notif'];}
         if(!empty($array['modo_ejercicio'])){$this->modo_ejercicio = $array['modo_ejercicio'];}
-        if(!empty($array['foto_perfil'])){$this->modo_ejercicio = $array['foto_perfil'];}
+        if(!empty($array['foto_perfil'])){$this->foto_perfil = $array['foto_perfil'];}
 
         if(!empty($array['dias_semana']))
         {

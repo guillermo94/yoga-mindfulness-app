@@ -1,5 +1,5 @@
 @extends('adminlte::layouts.app')
-@section('PageName', 'EditProgram')
+@section('PageName', 'ModifyProgram')
 
 @section('htmlheader_title')
     {{ trans('adminlte_lang::message.home') }}

@@ -44,15 +44,31 @@
                     @else 
                     <li>
                     @endif<a href="{{ url('addlesson') }}">{{ trans('adminlte_lang::message.linkaddlesson') }}</a></li>
-                    <li><a href="{{ url('editlesson') }}">{{ trans('adminlte_lang::message.linkmodlesson') }}</a></li>
+                    @if($__env->yieldContent('PageName') == 'ModifyLesson')
+                        <li class="active">
+                    @else
+                    <li>
+                    @endif<a href="{{ url('editlesson') }}">{{ trans('adminlte_lang::message.linkmodlesson') }}</a></li>
                 </ul>
             </li>
-             <li class="treeview">
+            @if($__env->yieldContent('PageName') == 'AddProgram' || $__env->yieldContent('PageName') == 'ModifyProgram')
+                <li class="treeview active">
+            @else
+            <li class="treeview">
+            @endif
                 <a href="#"><i class='fa fa-link'></i> <span>{{ trans('adminlte_lang::message.submenuprograms') }}</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">
-                    
-                    <li><a href="{{ url('addprogram') }}">{{ trans('adminlte_lang::message.linkaddprogram') }}</a></li>
-                    <li><a href="{{ url('editprogram') }}">{{ trans('adminlte_lang::message.linkmodprogram') }}</a></li>
+
+                    @if($__env->yieldContent('PageName') == 'AddProgram')
+                        <li class="active">
+                    @else
+                        <li>
+                    @endif<a href="{{ url('addprogram') }}">{{ trans('adminlte_lang::message.linkaddprogram') }}</a></li>
+                    @if($__env->yieldContent('PageName') == 'ModifyProgram')
+                        <li class="active">
+                    @else
+                        <li>
+                    @endif<a href="{{ url('editprogram') }}">{{ trans('adminlte_lang::message.linkmodprogram') }}</a></li>
                 </ul>
             </li>
         </ul><!-- /.sidebar-menu -->

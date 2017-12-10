@@ -189,6 +189,10 @@ return [
         /*Laravel autoinstaller provider*/
         RachidLaasri\LaravelInstaller\Providers\LaravelInstallerServiceProvider::class,
 
+        /*For FireBase notifications*/
+        LaravelFCM\FCMServiceProvider::class,
+
+
         'Intervention\Image\ImageServiceProvider'
 
     ],
@@ -245,7 +249,11 @@ return [
         * Acacha AdminLTE template alias
         */
         'AdminLTE' => Acacha\AdminLTETemplateLaravel\Facades\AdminLTE::class,
-        'Image' => 'Intervention\Image\Facades\Image'
+        'Image' => 'Intervention\Image\Facades\Image',
+
+        /*For FireBase notifications*/
+        'FCM'      => LaravelFCM\Facades\FCM::class,
+	    'FCMGroup' => LaravelFCM\Facades\FCMGroup::class
 
     ],
 

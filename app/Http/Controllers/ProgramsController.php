@@ -7,6 +7,9 @@ use App\Categoriasprograma;
 use App\Ejercicio;
 use App\Programa;
 use App\Usuario;
+use LaravelFCM\Message\Topics;
+use LaravelFCM\Message\PayloadNotificationBuilder;
+use FCM;
 
 class ProgramsController extends Controller
 {
@@ -20,7 +23,7 @@ class ProgramsController extends Controller
          $ejercicios = Ejercicio::all();
        // $ejercicioArray = json_decode($jsonResult, true);
           $categoriaprograma = Categoriasprograma::all();
-        return view('vendor.adminlte.addprogram', compact('categoriaprograma', 'ejercicios'));
+        return view('vendor.adminlte.addprogram2', compact('categoriaprograma', 'ejercicios'));
     }
 
 
@@ -60,8 +63,36 @@ class ProgramsController extends Controller
             $numEjercicios++;
 
         }
-        $newPrograma->num_ejercicios = $numEjercicios;
+        $jsonResult3 = $request->input('arrayCatergorias');
+        $arrayCategorias = json_decode($jsonResult3, true);
+//         return $arrayCategorias;
+        foreach ($arrayCategorias as $categoria){
+            $newCategoria = Categoriasprograma::where('nombre', '=', $categoria)->first();
+            if (!$newCategoria) {
+                $newCategoria = new Categoriasprograma;
+                $newCategoria->nombre = $categoria;
+                $newCategoria->save();
+            }
+            $newPrograma->categorias()->attach($newCategoria->Id);
+        }
+
+
         $newPrograma->save();
+        //Se envía una notificación a los usuarios que lo deseen
+        $notificationBuilder = new PayloadNotificationBuilder('¡Nuevo programa añadido!');
+        $notificationBuilder->setBody('El programa "'.$newPrograma->nombre. '" ha sido añadido y ya está disponible, ¡ACCEDE A ÉL!')
+            ->setSound('default');//->setIcon('http://'.$_SERVER['SERVER_ADDR'].$newEjercicio->miniatura);
+
+        $notification = $notificationBuilder->build();
+
+        $topic = new Topics();
+        $topic->topic('news');
+
+        $topicResponse = FCM::sendToTopic($topic, null, $notification, null);
+
+        $topicResponse->isSuccess();
+        $topicResponse->shouldRetry();
+        $topicResponse->error();
         return $newPrograma;
     }
 
@@ -82,6 +113,10 @@ class ProgramsController extends Controller
         }
         $newPrograma->num_ejercicios = $numEjercicios;
         $newPrograma->save();
+
+
+
+
         return $newPrograma;
     }
 
@@ -133,7 +168,8 @@ class ProgramsController extends Controller
         $programas = Programa::where('usuario_Id','=',null)->get();
         $programas->each(function($programa) 
         {
-           $programa->ejercicios; 
+           $programa->ejercicios;
+           $programa->categorias;
         });
 
         return $programas;
@@ -146,6 +182,7 @@ class ProgramsController extends Controller
         $programas->each(function($programa)
         {
             $programa->ejercicios;
+            $programa->categorias;
         });
 
         return $programas;

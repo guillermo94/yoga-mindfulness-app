@@ -5,22 +5,25 @@ namespace App\Http\Controllers;
 use App\ComentarioEjercicio;
 use Illuminate\Http\Request;
 use App\Ejercicio;
-use App\CategoriasEjercicio;
+use App\Categoriasejercicio;
 use App\SliderFinalOpcion;
 use Image;
-
+use LaravelFCM\Message\Topics;
+use LaravelFCM\Message\PayloadNotificationBuilder;
+use FCM;
 use Session;
-
 
 class LessonsController extends Controller
 {
     public function index()
     {
-        Session::put('categoriaNuevoEjericio', array());
+
+
+       Session::put('categoriaNuevoEjericio', array());
         Session::put('seccionesEjercicio', array());
         Session::pull('numSeccionesEjercicio', 'default');
         $categoriaejercicios = CategoriasEjercicio::all();
-        return view('vendor.adminlte.addlesson', compact('categoriaejercicios'));
+        return view('vendor.adminlte.addlesson2', compact('categoriaejercicios'));
     }
 
     public function indexModify()
@@ -44,18 +47,80 @@ class LessonsController extends Controller
      */
     public function store(Request $request)
     {
-
         $jsonResult = $request->input('arrayFinal');
             $arrayEjercicio = json_decode($jsonResult, true);
         $arrayEjercicio = $arrayEjercicio[0];
 
         if (!empty($arrayEjercicio['id'])) {
             $newEjercicio = Ejercicio::findOrFail($arrayEjercicio['id']);
+            //Se eliminan las categorias y las preguntas finales anteriores para añadir las nuevas
+            $newEjercicio->categorias()->delete();
+            $newEjercicio->opcionespreguntafinal()->delete();
+            //Se eliminan los componentes anteriores del ejercicio para almacenar los nuevos
+            foreach ($newEjercicio->secciones as $seccion) {
+                $existeSeccion = False;
+                foreach ($arrayEjercicio['secciones'] as $seccionRequest) {
+                    if(array_key_exists('id', $seccionRequest)) {
+                        if ($seccionRequest['id'] == $seccion->Id) {
+                            $existeSeccion = True;
+                            foreach ($seccion->acciones as $accion) {
+                                $existeAccion = False;
+                                foreach ($seccionRequest['acciones'] as $accionRequest) {
+                                    if(array_key_exists('id', $accionRequest)) {
+                                        if ($accionRequest['id'] == $accion->Id) {
+                                            if($accionRequest['tipo'] == "Mediante imagen + texto" && $accionRequest['tipo'] == $accion->tipo) {
+                                                $existeAccion = True;
+                                                foreach ($accion->instrucciones as $instruccion) {
+                                                    $existeInstruccion= False;
+                                                    foreach ($accionRequest['instrucciones'] as $instruccionRequest) {
+                                                        if(array_key_exists('id', $instruccionRequest)) {
+                                                            if ($instruccionRequest['id'] == $instruccion->Id) {
+                                                                $existeInstruccion=true;
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+                                                    if(!$existeInstruccion){
+                                                        $instruccion->delete();
+                                                    }
+                                                }
+                                            }
+                                            break;
+                                        }
+                                    }
+                                }
+                                if(!$existeAccion){
+                                    $accion->delete();
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+                if(!$existeSeccion){
+                    $seccion->delete();
+                }
+
+            }
         } else {
             $newEjercicio = new Ejercicio;
             $newEjercicio->save();
         }
         $newEjercicio->setAttributes($request);
+
+        $jsonResult3 = $request->input('arrayCatergorias');
+        $arrayCategorias = json_decode($jsonResult3, true);
+
+        foreach ($arrayCategorias as $categoria){
+            $newCategoria = Categoriasejercicio::where('nombre', '=', $categoria)->first();
+            if (!$newCategoria) {
+                $newCategoria = new Categoriasejercicio;
+                $newCategoria->nombre = $categoria;
+                $newCategoria->save();
+            }
+            $newEjercicio->categorias()->attach($newCategoria->Id);
+
+        }
         $newEjercicio->save();
 
 
@@ -73,32 +138,21 @@ class LessonsController extends Controller
 
 
 
+         //Se envía una notificación a los usuarios que lo deseen
+        $notificationBuilder = new PayloadNotificationBuilder('¡Nueva clase añadida!');
+        $notificationBuilder->setBody('La clase "'.$newEjercicio->nombre. '" ha sido añadida y ya está disponible, ¡ACCEDE A ELLA!')
+            ->setSound('default');//->setIcon('http://'.$_SERVER['SERVER_ADDR'].$newEjercicio->miniatura);
 
-      /*  foreach ($newEjercicio->secciones as $seccion) {
-            $seccion->acciones;
-            foreach ($seccion->acciones as $accion) {
-                \Storage::disk('local')->put($newEjercicio->Id . ,  \File::get($accion->fichero));
+        $notification = $notificationBuilder->build();
 
-                $accion->instrucciones;
-            }
-        }
-        $arrayEjercicio = json_decode($newEjercicio, true);
-*/
-      /* foreach($arrayEjercicio['secciones'] as $seccion){
-            foreach($seccion['acciones'] as $accion){
-                //Storage::disk('local')->putFileAs('ficherosInstrucciones', $request->file('file?'.$seccion['pos'].
-                 //   '&'.$accion['pos']), $newEjercicio->Id . '_'.$seccion['pos'].'_'.$accion['pos'].'.jpeg');
-                $image = $request->file('file?'.$seccion['pos'].'&'.$accion['pos']);
-                $input['imagename'] = $newEjercicio->Id . '_'.$seccion['pos'].'_'.$accion['pos'].'.'.$image->getClientOriginalExtension();
-                $destinationPath = public_path('/ficherosInstrucciones');
-                $img = Image::make($image->getRealPath());
-                $img->resize(500, 500, function ($constraint) {
-                    $constraint->aspectRatio();
-                })->save($destinationPath.'/'.$input['imagename']);
+        $topic = new Topics();
+        $topic->topic('news');
 
+        $topicResponse = FCM::sendToTopic($topic, null, $notification, null);
 
-            }
-         }*/
+        $topicResponse->isSuccess();
+        $topicResponse->shouldRetry();
+        $topicResponse->error();
 
         return $arrayEjercicio;
     }
@@ -112,6 +166,7 @@ class LessonsController extends Controller
             $ejercicio->comentarios->each(function ($comentario) {
                 $comentario->usuario;
             });
+            $ejercicio->categorias;
         }
         return $ejercicios;
     }
@@ -132,6 +187,7 @@ class LessonsController extends Controller
         {
             $comentario->usuario;
         });
+        $ejercicio->categorias;
         return $ejercicio;
     }
     public function showInPanel($id)
@@ -156,7 +212,11 @@ class LessonsController extends Controller
                 $accion->instrucciones;
             }
         }
-        return view('vendor.adminlte.editlesson', compact('ejercicio'));
+        $ejercicio->categorias;
+        $ejercicio->opcionespreguntafinal;
+        $categoriaejercicios = CategoriasEjercicio::all();
+
+        return view('vendor.adminlte.editlesson2', compact('ejercicio', 'categoriaejercicios'));
     }
 
 

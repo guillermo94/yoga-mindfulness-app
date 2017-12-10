@@ -32,6 +32,10 @@ class Ejercicio extends Model
         return $this->hasMany('App\SliderFinalOpcion');
     }
 
+    public function categorias(){
+        return $this->belongsToMany('\App\Categoriasejercicio','categoriasejercicios_ejercicios');
+    }
+
     public function setAttributes(Request $request)
     {
         $jsonResult = $request->input('arrayFinal');
@@ -41,6 +45,7 @@ class Ejercicio extends Model
         if (!empty($array['introduccion'])) {
             $this->introduccion = $array['introduccion'];
         }
+
 
 
 

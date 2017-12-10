@@ -35,11 +35,14 @@ class Accionejercicio extends Model
             $this->num_repeticiones = $array['num_repeticiones'];
         }
 
-        $filepath = '/ficherosInstrucciones';
-        $file = $request->file('file?'.$posSec.'&'.$array['pos']);
-        $input['imagename'] = $idEjer . '_'.$posSec.'_'.$array['pos'].'.'.$file->getClientOriginalExtension();
-        $destinationPath = public_path($filepath);
+        if($request->file('file?'.$posSec.'&'.$array['pos'])!=null) {
+            $filepath = '/ficherosInstrucciones';
+            $file = $request->file('file?' . $posSec . '&' . $array['pos']);
+            $input['imagename'] = $idEjer . '_' . $posSec . '_' . $array['pos'] . '.' . $file->getClientOriginalExtension();
+            $destinationPath = public_path($filepath);
+            $this->url_file= $filepath.'/'.$input['imagename'];
 
+        }
         $this->tipo = $array['tipo'];
         if($array['tipo'] == "Mediante imagen + texto") {
             if (!empty($array['instrucciones'])) {
@@ -54,22 +57,24 @@ class Accionejercicio extends Model
                 }
             }
 
+            if($request->file('file?'.$posSec.'&'.$array['pos'])!=null) {
 
-            $img = Image::make($file->getRealPath());
-            $img->resize(500, 500, function ($constraint) {
-                $constraint->aspectRatio();
-            })->save($destinationPath.'/'.$input['imagename']);
+                $img = Image::make($file->getRealPath());
+                $img->resize(500, 500, function ($constraint) {
+                    $constraint->aspectRatio();
+                })->save($destinationPath.'/'.$input['imagename']);
+            }
         }
         else{
-            Storage::putFileAs(
-                $filepath,$file, $input['imagename']
-            );
+
+            $nombre = $file->getClientOriginalName();
+
+            \Storage::disk('local')->put($input['imagename'],  \File::get($file));
 
            // $file->store($filepath.'/'.$input['imagename']);
 
         }
 
-        $this->url_file= $filepath.'/'.$input['imagename'];
         $this->save();
     }
 }

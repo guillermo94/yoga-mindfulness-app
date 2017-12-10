@@ -58,7 +58,11 @@ class UsuariosAppController extends Controller
         if (Hash::check($pass, $usuario->password)) {
            $usuario->dias_semana;
            if($usuario->programa_asignado != null) {
-               $usuario->programa_asignado->ejercicios;
+               $usuario->programa_asignado->ejercicios->each(function($ejercicio)
+               {
+                   $ejercicio->categorias;
+               });
+               $usuario->programa_asignado->categorias;
            }
             return $usuario;
         }
@@ -71,6 +75,7 @@ class UsuariosAppController extends Controller
         $usuario->programas->each(function($programa)
         {
             $programa->ejercicios;
+            $programa->categorias;
         });
         return $usuario->programas;
     }
@@ -80,6 +85,7 @@ class UsuariosAppController extends Controller
         $usuario->programas_creados->each(function($programa)
         {
             $programa->ejercicios;
+            $programa->categorias;
         });
         return $usuario->programas_creados;
     }
