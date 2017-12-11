@@ -186,10 +186,7 @@ return [
         Way\Generators\GeneratorsServiceProvider::class,
         Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class,
 
-        /*Laravel autoinstaller provider*/
-        RachidLaasri\LaravelInstaller\Providers\LaravelInstallerServiceProvider::class,
-
-        /*For FireBase notifications*/
+      /*For FireBase notifications*/
         LaravelFCM\FCMServiceProvider::class,
 
 
